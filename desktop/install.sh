@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# Verificar ejecución como root
+if [ "$EUID" -ne 0 ]; then
+    echo "Este script debe ejecutarse como root."
+    echo "Ejecuta: sudo $0"
+    exit 1
+fi
+
+echo "Ejecutando como root..."
+
 echo "Habilitar multilib repository"
 # Habilitar multilib
 sed -i '/^\#\[multilib\]/,/^#Include/s/^#//' /etc/pacman.conf
