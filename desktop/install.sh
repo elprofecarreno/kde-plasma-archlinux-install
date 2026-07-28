@@ -58,6 +58,7 @@ gst-plugins-bad \
 gst-plugins-ugly \
 gst-libav \
 keepassxc \
+konsole \
 bluez \
 bluez-utils
 
