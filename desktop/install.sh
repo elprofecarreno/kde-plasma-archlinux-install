@@ -39,8 +39,6 @@ plasma-wayland-session \
 xorg-xwayland \
 xdg-desktop-portal \
 xdg-desktop-portal-kde \
-mesa \
-libglvnd \
 obs-studio \
 vlc \
 qt6-multimedia-gstreamer \
@@ -95,6 +93,8 @@ do
     case $REPLY in
         1)
             pacman -S --noconfirm \
+                mesa \
+                libglvnd \
                 vulkan-icd-loader \
                 vulkan-tools
             break
