@@ -23,6 +23,8 @@ pipewire \
 ttf-jetbrains-mono-nerd \
 dolphin \
 ark \
+pipewire \
+pipewire-pulse \
 wireplumber \
 flatpak \
 git \
@@ -44,7 +46,29 @@ gst-plugins-good \
 gst-plugins-bad \
 gst-plugins-ugly \
 gst-libav \
-keepassxc
+keepassxc \
+bluez \
+bluez-utils
+
+echo "Enable NetworkManager Services"
+systemctl enable NetworkManager
+echo "Enable sddm Services"
+systemctl enable sddm
+echo "Enable sshd Services"
+systemctl enable sshd
+echo "Enable ufw Services"
+systemctl enable ufw
+systemctl start ufw
+ufw enable
+echo "Enable bluetooth Services"
+systemctl enable bluetooth
+echo "Enable pipewire Services"
+systemctl --user enable pipewire
+systemctl --user enable pipewire-pulse
+systemctl --user enable wireplumber
+systemctl --user start pipewire pipewire-pulse wireplumber
+echo "Enable system-timesyncd Services"
+systemctl enable systemd-timesyncd
 
 echo "Instalación Teams -> Flathub"
 flatpak install -y flathub com.github.IsmaelMartinez.teams_for_linux
