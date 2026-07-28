@@ -44,7 +44,7 @@ ufw \
 plasma-systemmonitor \
 gparted \
 plasma \
-plasma-wayland-session \
+#plasma-wayland-session \
 xorg-xwayland \
 xdg-desktop-portal \
 xdg-desktop-portal-kde \
