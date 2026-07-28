@@ -25,15 +25,18 @@ unrar \
 unzip \
 nano \
 sddm \
+qt6-multimedia-gstreamer \
 networkmanager \
 discover \
 pipewire \
+pipewire-pulse \
+pipewire-jack \
+wireplumber \
+plasma-desktop \
+plasma-nm \
 ttf-jetbrains-mono-nerd \
 dolphin \
 ark \
-pipewire \
-pipewire-pulse \
-wireplumber \
 flatpak \
 git \
 wget \
@@ -41,22 +44,9 @@ curl \
 rsync \
 openssh \
 ufw \
-plasma-systemmonitor \
 gparted \
-plasma \
-#plasma-wayland-session \
-xorg-xwayland \
-xdg-desktop-portal \
-xdg-desktop-portal-kde \
 obs-studio \
 vlc \
-qt6-multimedia-gstreamer \
-gstreamer \
-gst-plugins-base \
-gst-plugins-good \
-gst-plugins-bad \
-gst-plugins-ugly \
-gst-libav \
 keepassxc \
 konsole \
 bluez \
@@ -74,11 +64,11 @@ systemctl start ufw
 ufw enable
 echo "Enable bluetooth Services"
 systemctl enable bluetooth
-echo "Enable pipewire Services"
-systemctl --user enable pipewire
-systemctl --user enable pipewire-pulse
-systemctl --user enable wireplumber
-systemctl --user start pipewire pipewire-pulse wireplumber
+#echo "Enable pipewire Services"
+#systemctl --user enable pipewire
+#systemctl --user enable pipewire-pulse
+#systemctl --user enable wireplumber
+#systemctl --user start pipewire pipewire-pulse wireplumber
 echo "Enable system-timesyncd Services"
 systemctl enable systemd-timesyncd
 
@@ -113,7 +103,7 @@ do
         2)
             pacman -S --noconfirm \
                 linux-headers \
-                nvidia \
+                nvidia-dkms \
                 nvidia-utils \
                 nvidia-settings \
                 lib32-nvidia-utils \
