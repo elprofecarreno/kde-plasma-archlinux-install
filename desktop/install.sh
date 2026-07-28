@@ -1,4 +1,3 @@
-#!/bin/sh
 #!/bin/bash
 
 echo "Habilitar multilib repository"
@@ -36,7 +35,12 @@ ufw \
 plasma-systemmonitor \
 gparted \
 plasma \
-plasma \
+plasma-wayland-session \
+xorg-xwayland \
+xdg-desktop-portal \
+xdg-desktop-portal-kde \
+mesa \
+libglvnd \
 obs-studio \
 vlc \
 qt6-multimedia-gstreamer \
