@@ -32,7 +32,9 @@ gst-plugins-good \
 gst-plugins-bad \
 gst-plugins-ugly \
 gst-libav \
-keepassxc
+keepassxc \
+vulkan-icd-loader \
+vulkan-tools
 
 sed -i 's/\#\[multilib\]/\[multilib\]' /etc/pacman.conf
 
