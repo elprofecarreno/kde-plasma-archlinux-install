@@ -1,5 +1,7 @@
 # KDE Plasma setup on Arch Linux
 
+[Version en espanol](./README.md)
+
 This repository provides scripts to set up a KDE Plasma desktop environment on Arch Linux and configure a GPG key for KDE Wallet.
 
 ## Included scripts
