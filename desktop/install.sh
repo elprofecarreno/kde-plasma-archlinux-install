@@ -31,9 +31,13 @@ discover \
 pipewire \
 pipewire-pulse \
 pipewire-jack \
+pipewire-alsa \
 wireplumber \
+lib32-pipewire \
+pavucontrol
 plasma-desktop \
 plasma-nm \
+plasma-pa \
 ttf-jetbrains-mono-nerd \
 dolphin \
 ark \
@@ -50,7 +54,15 @@ vlc \
 keepassxc \
 konsole \
 bluez \
-bluez-utils
+bluez-utils \
+kwallet \
+kwalletmanager \
+kwrite \
+docker \
+docker-compose \
+flameshot \
+gnupg
+
 
 echo "Enable NetworkManager Services"
 systemctl enable NetworkManager
@@ -64,11 +76,13 @@ systemctl start ufw
 ufw enable
 echo "Enable bluetooth Services"
 systemctl enable bluetooth
-#echo "Enable pipewire Services"
-#systemctl --user enable pipewire
-#systemctl --user enable pipewire-pulse
-#systemctl --user enable wireplumber
-#systemctl --user start pipewire pipewire-pulse wireplumber
+echo "Enable docker Services"
+sudo systemctl enable docker.service
+echo "Enable PipeWire Services (System-wide templates)"
+# Habilitar los sockets a nivel de usuario global para nuevos usuarios
+systemctl --global enable pipewire.socket
+systemctl --global enable pipewire-pulse.socket
+systemctl --global enable wireplumber.service
 echo "Enable system-timesyncd Services"
 systemctl enable systemd-timesyncd
 
@@ -78,9 +92,10 @@ echo "Instalación Chrome -> Flathub"
 flatpak install -y flathub com.google.Chrome
 echo "Instalación Discord -> Flathub"
 flatpak install -y flathub com.discordapp.Discord
-echo "Instalación Teams -> OnlyOffice"
+echo "Instalación OnlyOffice -> Flathub"
 flatpak install -y flathub org.onlyoffice.desktopeditors
-
+echo "Instalación Brave -> Flathub"
+flatpak install -y flathub com.brave.Browser
 PS3="Selecciona driver GPU: "
 
 select DRIVER in \
@@ -126,7 +141,7 @@ do
                 mesa \
                 vulkan-intel \
                 lib32-vulkan-intel \
-                vulkan-tools
+                vulkan-tools 
             break
             ;;
 
@@ -140,3 +155,4 @@ do
     esac
 done
 
+reboot
