@@ -32,31 +32,23 @@ echo -e "\n${CYAN}==> Detectando gestor de arranque...${RESET}"
 
 
 if [ -d /sys/firmware/efi ]; then
-
     BOOT_MODE="UEFI"
-
 else
-
     BOOT_MODE="BIOS"
-
 fi
-
 
 
 if command -v grub-install &>/dev/null; then
 
     BOOTLOADER="GRUB"
 
-
 elif [ -d /boot/loader ]; then
 
     BOOTLOADER="systemd-boot"
 
-
 elif [ -f /boot/limine.conf ]; then
 
     BOOTLOADER="Limine"
-
 
 else
 
@@ -66,6 +58,57 @@ fi
 
 
 echo -e "${GREEN}[ OK ]${RESET} $BOOTLOADER ($BOOT_MODE)"
+
+}
+
+
+
+install_group()
+{
+
+local name="$1"
+
+shift
+
+
+echo -e "\n${CYAN}==> Instalando ${name}...${RESET}"
+
+
+pacman -S --noconfirm --needed "$@" >/dev/null 2>&1
+
+
+
+local failed=()
+
+
+
+for pkg in "$@"
+do
+
+    if ! pacman -Qi "$pkg" &>/dev/null; then
+
+        failed+=("$pkg")
+
+    fi
+
+done
+
+
+
+if [ ${#failed[@]} -eq 0 ]; then
+
+    echo -e "${GREEN}[  OK  ]${RESET} ${name}"
+
+else
+
+    echo -e "${RED}[FAIL ]${RESET} ${name}"
+
+    echo -e "${RED}Paquetes faltantes:${RESET}"
+
+    printf " - %s\n" "${failed[@]}"
+
+fi
+
 
 }
 
@@ -83,6 +126,7 @@ GPU_INFO=$(lspci | grep -Ei "VGA|3D|Display")
 echo "$GPU_INFO"
 
 echo
+
 
 
 if echo "$GPU_INFO" | grep -qi nvidia && \
@@ -129,435 +173,9 @@ echo -e "${GREEN}[ OK ] Driver recomendado: ${RECOMMENDED}${RESET}"
 
 if [ "$HYBRID" = true ]; then
 
-    echo -e "${YELLOW}[INFO] Sistema híbrido Intel + NVIDIA detectado${RESET}"
-
-fi
-
-}
-
-
-
-install_group()
-{
-
-local name="$1"
-
-shift
-
-
-echo -e "\n${CYAN}==> Instalando ${name}...${RESET}"
-
-
-pacman -S --noconfirm --needed "$@" >/dev/null 2>&1
-
-
-
-local failed=()
-
-
-for pkg in "$@"
-do
-
-    if ! pacman -Qi "$pkg" &>/dev/null; then
-
-        failed+=("$pkg")
-
-    fi
-
-done
-
-
-
-if [ ${#failed[@]} -eq 0 ]; then
-
-
-    echo -e "${GREEN}[  OK  ]${RESET} ${name}"
-
-
-else
-
-
-    echo -e "${RED}[FAIL ]${RESET} ${name}"
-
-    echo -e "${RED}Paquetes faltantes:${RESET}"
-
-    printf " - %s\n" "${failed[@]}"
-
+echo -e "${YELLOW}[INFO] Sistema híbrido Intel + NVIDIA detectado${RESET}"
 
 fi
 
 
 }
-
-
-
-install_common()
-{
-
-install_group "Componentes gráficos base" \
-    mesa \
-    libglvnd \
-    vulkan-icd-loader \
-    vulkan-tools \
-    lib32-mesa
-
-}
-
-
-
-install_nvidia()
-{
-
-
-install_group "NVIDIA propietario" \
-    linux-headers \
-    nvidia-dkms \
-    nvidia-utils \
-    nvidia-settings \
-    nvidia-prime \
-    switcheroo-control \
-    lib32-nvidia-utils \
-    vulkan-icd-loader \
-    vulkan-tools
-
-
-
-echo -e "${CYAN}==> Regenerando initramfs...${RESET}"
-
-mkinitcpio -P
-
-
-echo -e "${GREEN}[ OK ] Initramfs actualizado${RESET}"
-
-
-
-}
-
-
-
-install_amd()
-{
-
-
-install_group "AMD Mesa" \
-    mesa \
-    vulkan-radeon \
-    lib32-vulkan-radeon \
-    vulkan-tools
-
-
-}
-
-
-
-install_intel()
-{
-
-
-install_group "Intel Mesa" \
-    mesa \
-    vulkan-intel \
-    lib32-vulkan-intel \
-    vulkan-tools
-
-
-}
-
-
-
-configure_nvidia_kms()
-{
-
-
-echo -e "\n${CYAN}==> Configurando NVIDIA DRM KMS...${RESET}"
-
-
-
-case $BOOTLOADER in
-
-
-GRUB)
-
-
-    if grep -q "nvidia_drm.modeset=1" /etc/default/grub; then
-
-
-        echo -e "${GREEN}[ OK ] NVIDIA DRM KMS ya configurado${RESET}"
-
-
-    else
-
-
-        sed -i \
-        's/GRUB_CMDLINE_LINUX_DEFAULT="/GRUB_CMDLINE_LINUX_DEFAULT="nvidia_drm.modeset=1 /' \
-        /etc/default/grub
-
-
-
-        grub-mkconfig -o /boot/grub/grub.cfg
-
-
-
-        echo -e "${GREEN}[ OK ] NVIDIA DRM KMS agregado${RESET}"
-
-
-    fi
-
-
-;;
-
-
-systemd-boot)
-
-
-    echo -e "${YELLOW}[INFO] systemd-boot detectado${RESET}"
-
-    echo -e "${YELLOW}Agregar manualmente: nvidia_drm.modeset=1${RESET}"
-
-
-;;
-
-
-Limine)
-
-
-    echo -e "${YELLOW}[INFO] Limine detectado${RESET}"
-
-
-;;
-
-
-*)
-
-
-    echo -e "${RED}[FAIL] Bootloader desconocido${RESET}"
-
-
-;;
-
-
-esac
-
-
-}
-
-
-
-validate_vulkan()
-{
-
-
-echo -e "\n${CYAN}==> Verificando Vulkan...${RESET}"
-
-
-
-if command -v vulkaninfo &>/dev/null; then
-
-
-
-    GPU_VULKAN=$(vulkaninfo --summary 2>/dev/null | grep "GPU id")
-
-
-
-    if [ -n "$GPU_VULKAN" ]; then
-
-
-        echo -e "${GREEN}[ OK ] Vulkan funcionando${RESET}"
-
-        echo "$GPU_VULKAN"
-
-
-    else
-
-
-        echo -e "${RED}[FAIL] Vulkan no detectó GPU${RESET}"
-
-
-    fi
-
-
-
-else
-
-
-    echo -e "${RED}[FAIL] vulkan-tools no instalado${RESET}"
-
-
-fi
-
-
-}
-
-
-
-menu_driver()
-{
-
-
-while true
-do
-
-
-echo
-
-echo -e "${MAGENTA}============================================${RESET}"
-echo -e "${MAGENTA}           Instalación Drivers GPU          ${RESET}"
-echo -e "${MAGENTA}============================================${RESET}"
-
-
-echo
-
-echo -e "${CYAN}GPU recomendada:${RESET} ${GREEN}${RECOMMENDED}${RESET}"
-
-
-echo
-
-echo -e "${BLUE}1)${RESET} Instalar recomendado (${GREEN}${RECOMMENDED}${RESET})"
-echo -e "${BLUE}2)${RESET} NVIDIA propietario"
-echo -e "${BLUE}3)${RESET} AMD Mesa"
-echo -e "${BLUE}4)${RESET} Intel Mesa"
-echo -e "${BLUE}5)${RESET} Vulkan genérico"
-echo -e "${BLUE}6)${RESET} Sin driver"
-
-
-echo
-
-
-read -p "$(echo -e "${YELLOW}Seleccione driver: ${RESET}")" OPTION
-
-
-
-case $OPTION in
-
-
-1)
-
-case $RECOMMENDED in
-
-
-NVIDIA)
-
-    install_nvidia
-    configure_nvidia_kms
-
-;;
-
-
-AMD)
-
-    install_amd
-
-;;
-
-
-Intel)
-
-    install_intel
-
-;;
-
-
-*)
-
-    install_common
-
-;;
-
-
-esac
-
-
-break
-
-;;
-
-
-2)
-
-install_nvidia
-configure_nvidia_kms
-
-break
-
-;;
-
-
-3)
-
-install_amd
-
-break
-
-;;
-
-
-4)
-
-install_intel
-
-break
-
-;;
-
-
-5)
-
-install_common
-
-break
-
-;;
-
-
-6)
-
-echo -e "${YELLOW}[INFO] Sin instalación de drivers GPU${RESET}"
-
-break
-
-;;
-
-
-*)
-
-echo -e "${RED}[ERROR] Opción inválida${RESET}"
-
-;;
-
-
-esac
-
-
-done
-
-
-}
-
-
-
-clear
-
-echo -e "${MAGENTA}============================================${RESET}"
-echo -e "${MAGENTA}        Instalador Drivers Arch KDE          ${RESET}"
-echo -e "${MAGENTA}============================================${RESET}"
-
-
-check_root
-
-detect_bootloader
-
-detect_gpu
-
-menu_driver
-
-validate_vulkan
-
-
-
-echo
-
-echo -e "${MAGENTA}------------------------------------------------------------${RESET}"
-echo -e "${GREEN}Instalación de drivers finalizada.${RESET}"
-echo -e "${YELLOW}Se recomienda reiniciar:${RESET}"
-echo -e "${CYAN}sudo reboot${RESET}"
-echo -e "${MAGENTA}------------------------------------------------------------${RESET}"
