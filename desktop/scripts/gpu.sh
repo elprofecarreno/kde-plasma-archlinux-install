@@ -16,7 +16,8 @@ check_root() {
     fi
 }
 
-detect_bootloader() {
+detect_bootloader()
+{
     echo -e "\n${CYAN}==> Detectando gestor de arranque...${RESET}"
 
     if [ -d /sys/firmware/efi ]; then
@@ -26,17 +27,22 @@ detect_bootloader() {
     fi
 
     BOOT_TYPE=""
-
     if command -v grub-install &>/dev/null && [ -d /boot/grub ]; then
         BOOTLOADER="GRUB"
         BOOT_TYPE="GRUB"
-    elif [ -f /boot/EFI/Linux/arch-linux.efi ]; then
+    elif command -v bootctl &>/dev/null && \
+         [ -f /boot/EFI/systemd/systemd-bootx64.efi ]; then
+
         BOOTLOADER="systemd-boot"
-        BOOT_TYPE="UKI"
-    elif [ -d /boot/loader/entries ] && \
-        ls /boot/loader/entries/*.conf &>/dev/null; then
-        BOOTLOADER="systemd-boot"
-        BOOT_TYPE="Entries"
+        if [ -f /boot/EFI/Linux/arch-linux.efi ]; then
+            BOOT_TYPE="UKI"
+        elif [ -d /boot/loader/entries ] && \
+             ls /boot/loader/entries/*.conf &>/dev/null; then
+            BOOT_TYPE="Entries"
+        else
+            BOOT_TYPE="Desconocido"
+        fi
+
     elif [ -f /boot/limine.conf ]; then
         BOOTLOADER="Limine"
         BOOT_TYPE="Limine"
