@@ -89,11 +89,11 @@ show_menu() {
             4)
                 echo -e "\n${CYAN}==> Configurando servicios...${RESET}"
 
-                if [ -f "./services.sh" ]; then
-                    chmod +x ./services.sh
-                    ./services.sh
+                if [ -f "./scripts/services.sh" ]; then
+                    chmod +x ./scripts/services.sh
+                    ./scripts/services.sh
                 else
-                    echo -e "${RED}[FAIL] No existe services.sh${RESET}"
+                    echo -e "${RED}[FAIL] No existe ./scripts/services.sh${RESET}"
                 fi
             ;;
 
