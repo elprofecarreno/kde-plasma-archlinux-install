@@ -46,6 +46,7 @@ show_menu() {
         echo -e "${BLUE}3)${RESET} Instalar drivers de video"
         echo -e "${BLUE}4)${RESET} Instalar servicios"
         echo -e "${RED}5)${RESET} Salir"
+        echo -e "${RED}6)${RESET} Reiniciar PC"
         echo -e "${CYAN}======================================================${RESET}"
 
         echo -ne "${YELLOW}Seleccione una opción: ${RESET}"
@@ -102,9 +103,14 @@ show_menu() {
                 exit 0
             ;;
 
+            6)
+                echo -e "\n${YELLOW}Reiniciando el equipo...${RESET}"
+                reboot
+            ;;
+
             *)
                 echo -e "\n${RED}[ERROR] Opción inválida: $option${RESET}"
-                echo -e "${YELLOW}Seleccione una opción entre 1 y 5.${RESET}"
+                echo -e "${YELLOW}Seleccione una opción entre 1 y 6.${RESET}"
                 sleep 2
             ;;
 
