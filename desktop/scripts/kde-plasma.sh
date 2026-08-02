@@ -151,6 +151,7 @@ install_group "Conectividad" \
     network-manager-applet \
     openssh \
     bluez \
+    bluedevil \
     bluez-utils
 
 
