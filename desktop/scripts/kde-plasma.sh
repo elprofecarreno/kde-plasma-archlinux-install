@@ -143,6 +143,7 @@ install_group "Multimedia" \
     wireplumber \
     lib32-pipewire \
     pavucontrol \
+    firefox \
     obs-studio
 
 
